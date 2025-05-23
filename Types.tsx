@@ -57,4 +57,15 @@ export type InventoryItemType = {
   sourceImageUrl?: string;
   notes?: string;
   originalBox?: BoundingBox2DType | BoundingBoxMaskType;
+  metadata?: ItemMetadata;
+};
+
+export type ItemMetadata = {
+  brand?: string;
+  condition?: string;
+  resaleValue?: string;
+  manufacturerWebsite?: string;
+  documentationLinks?: string[];
+  warrantyInfo?: string;
+  description?: string;
 };

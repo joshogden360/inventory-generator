@@ -17,7 +17,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {BoundingBox2DType, BoundingBoxMaskType, InventoryItemType} from './Types';
+import {
+  BoundingBox2DType,
+  BoundingBoxMaskType,
+  InventoryItemType,
+  ItemMetadata,
+} from './Types';
+import {GoogleGenAI} from '@google/genai';
+
+const ai = new GoogleGenAI({apiKey: process.env.API_KEY});
 
 export function getSvgPathFromStroke(stroke: any) {
   if (!stroke.length) return '';
@@ -42,6 +50,35 @@ export const loadImage = (src: string) => {
     img.src = src;
   });
 };
+
+export async function generateItemMetadata(
+  imageUrl: string,
+  label: string,
+): Promise<ItemMetadata> {
+  try {
+    const prompt = `Provide a brief description including brand, condition, resale value, website and warranty information for the item labelled "${label}".`;
+    const response = (
+      await ai.models.generateContent({
+        model: 'models/gemini-2.0-flash',
+        contents: [
+          {
+            role: 'user',
+            parts: [
+              {inlineData: {mimeType: 'image/png', data: imageUrl.split(',')[1]}},
+              {text: prompt},
+            ],
+          },
+        ],
+        config: {temperature: 0.4},
+      })
+    ).text;
+    const json = JSON.parse(response.includes('```json') ? response.split('```json')[1].split('```')[0] : response);
+    return json as ItemMetadata;
+  } catch (e) {
+    console.error('metadata generation failed', e);
+    return {};
+  }
+}
 
 export function generateUniqueId(): string {
   return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
@@ -89,7 +126,10 @@ export async function saveToInventory(
   
   // Convert to data URL - use PNG for better quality with transparency
   const croppedImageUrl = canvas.toDataURL('image/png', 1.0);
-  
+
+  // Generate metadata about the item
+  const metadata = await generateItemMetadata(croppedImageUrl, box.label);
+
   // Create inventory item
   const inventoryItem: InventoryItemType = {
     id: generateUniqueId(),
@@ -101,6 +141,7 @@ export async function saveToInventory(
     sourceImageUrl: sourceSrc,
     notes: '',
     originalBox: box,
+    metadata,
   };
   
   return inventoryItem;
@@ -141,7 +182,10 @@ export async function saveMaskToInventory(
   
   // Convert to data URL with high quality
   const maskedImageUrl = canvas.toDataURL('image/png', 1.0);
-  
+
+  // Generate metadata about the item
+  const metadata = await generateItemMetadata(maskedImageUrl, box.label);
+
   // Create inventory item with more default values
   const inventoryItem: InventoryItemType = {
     id: generateUniqueId(),
@@ -153,6 +197,7 @@ export async function saveMaskToInventory(
     sourceImageUrl: sourceSrc,
     notes: '',
     originalBox: box,
+    metadata,
   };
   
   return inventoryItem;

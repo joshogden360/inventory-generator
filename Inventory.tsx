@@ -275,6 +275,45 @@ function InventoryCard({ item, onDelete, onEditTags, onEditCategory, onEditNotes
               <div className="text-xs text-gray-500">
                 Added: {new Date(item.dateAdded).toLocaleDateString()}
               </div>
+              {item.metadata && (
+                <div className="space-y-1 text-xs mt-2">
+                  {item.metadata.brand && (
+                    <div>
+                      <span className="font-medium">Brand:</span> {item.metadata.brand}
+                    </div>
+                  )}
+                  {item.metadata.condition && (
+                    <div>
+                      <span className="font-medium">Condition:</span> {item.metadata.condition}
+                    </div>
+                  )}
+                  {item.metadata.resaleValue && (
+                    <div>
+                      <span className="font-medium">Resale:</span> {item.metadata.resaleValue}
+                    </div>
+                  )}
+                  {item.metadata.manufacturerWebsite && (
+                    <div>
+                      <a
+                        href={item.metadata.manufacturerWebsite}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 underline"
+                      >
+                        Website
+                      </a>
+                    </div>
+                  )}
+                  {item.metadata.warrantyInfo && (
+                    <div>
+                      <span className="font-medium">Warranty:</span> {item.metadata.warrantyInfo}
+                    </div>
+                  )}
+                  {item.metadata.description && (
+                    <div>{item.metadata.description}</div>
+                  )}
+                </div>
+              )}
             </div>
           </>
         )}
