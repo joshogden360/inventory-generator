@@ -29,7 +29,7 @@ import {
   LinesAtom,
   PointsAtom,
   ShareStream,
-} from './atoms';
+} from '../state/atoms';
 import {Palette} from './Palette';
 
 export function ExtraModeControls() {

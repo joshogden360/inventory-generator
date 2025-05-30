@@ -22,10 +22,17 @@ import {
   BoundingBoxMaskType,
   InventoryItemType,
   ItemMetadata,
-} from './Types';
-import {GoogleGenAI} from '@google/genai';
+} from '../types/types';
+import {GoogleGenerativeAI, Part, GenerationConfig} from '@google/generative-ai';
 
-const ai = new GoogleGenAI({apiKey: process.env.API_KEY});
+const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+let ai: GoogleGenerativeAI | undefined;
+
+if (apiKey) {
+  ai = new GoogleGenerativeAI(apiKey);
+} else {
+  console.error("VITE_GEMINI_API_KEY is not set. Please ensure it is in your .env.local file.");
+}
 
 export function getSvgPathFromStroke(stroke: any) {
   if (!stroke.length) return '';
@@ -56,22 +63,28 @@ export async function generateItemMetadata(
   label: string,
 ): Promise<ItemMetadata> {
   try {
+    if (!ai) {
+      console.error("GoogleGenAI SDK not initialized");
+      return {};
+    }
+    
     const prompt = `Provide a brief description including brand, condition, resale value, website and warranty information for the item labelled "${label}".`;
-    const response = (
-      await ai.models.generateContent({
-        model: 'models/gemini-2.0-flash',
-        contents: [
-          {
-            role: 'user',
-            parts: [
-              {inlineData: {mimeType: 'image/png', data: imageUrl.split(',')[1]}},
-              {text: prompt},
-            ],
-          },
-        ],
-        config: {temperature: 0.4},
-      })
-    ).text;
+    const model = ai.getGenerativeModel({model: 'gemini-1.5-flash'});
+    const requestParts: Part[] = [
+      {inlineData: {mimeType: 'image/png', data: imageUrl.split(',')[1]}},
+      {text: prompt},
+    ];
+
+    const generationConfig: GenerationConfig = {temperature: 0.4};
+
+    const result = await model.generateContent({contents: [{role: 'user', parts: requestParts}], generationConfig});
+    const response = result.response.text();
+    
+    if (!response) {
+      console.warn('Empty response from AI model');
+      return {};
+    }
+    
     const json = JSON.parse(response.includes('```json') ? response.split('```json')[1].split('```')[0] : response);
     return json as ItemMetadata;
   } catch (e) {
@@ -127,8 +140,19 @@ export async function saveToInventory(
   // Convert to data URL - use PNG for better quality with transparency
   const croppedImageUrl = canvas.toDataURL('image/png', 1.0);
 
-  // Generate metadata about the item
-  const metadata = await generateItemMetadata(croppedImageUrl, box.label);
+  // Generate metadata about the item - with fallback if it fails
+  let metadata: ItemMetadata = {};
+  try {
+    metadata = await generateItemMetadata(croppedImageUrl, box.label);
+    console.log('Generated metadata for:', box.label, metadata);
+  } catch (error) {
+    console.warn('Failed to generate metadata, using defaults:', error);
+    metadata = {
+      description: `${box.label} detected in image`,
+      condition: 'Unknown',
+      resaleValue: 'Not assessed'
+    };
+  }
 
   // Create inventory item
   const inventoryItem: InventoryItemType = {
@@ -144,6 +168,7 @@ export async function saveToInventory(
     metadata,
   };
   
+  console.log('Created inventory item:', inventoryItem);
   return inventoryItem;
 }
 

@@ -23,16 +23,16 @@ import {
   defaultPromptParts,
   defaultPrompts,
   imageOptions,
-} from './consts';
+} from '../utils/consts';
 import {
   BoundingBox2DType,
   BoundingBox3DType,
   BoundingBoxMaskType,
   DetectTypes,
   InventoryItemType,
-} from './Types';
+} from '../types/types';
 
-export const ImageSrcAtom = atom<string | null>(imageOptions[0]);
+export const ImageSrcAtom = atom<string | null>(null);
 
 export const ImageSentAtom = atom(false);
 
@@ -96,6 +96,17 @@ export const IsUploadedImageAtom = atom(false);
 // New atoms for loading and inventory features
 export const IsLoadingAtom = atom(false);
 export const UploadProgressAtom = atom(0);
-export const ProcessingStatusAtom = atom<'idle' | 'uploading' | 'processing' | 'complete'>('idle');
+export const ProcessingStatusAtom = atom<'idle' | 'uploading' | 'processing' | 'complete' | 'error'>('idle');
 export const InventoryItemsAtom = atom<InventoryItemType[]>([]);
 export const ShowInventoryAtom = atom(false);
+export const InventorySidePanelModeAtom = atom(false);
+
+// File carousel atoms
+export const UploadedImagesAtom = atom<{id: string, src: string, name: string, uploadDate: string}[]>([]);
+export const CurrentImageIndexAtom = atom(0);
+export const ShowFileCarouselAtom = atom(false);
+
+// Layout control atoms
+export const LightroomLayoutModeAtom = atom(false);
+export const LeftPanelExpandedAtom = atom(false);
+export const ShowBottomCarouselAtom = atom(true);

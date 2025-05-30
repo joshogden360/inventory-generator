@@ -24,9 +24,9 @@ import {
   IsUploadedImageAtom,
   ProcessingStatusAtom,
   UploadProgressAtom
-} from './atoms';
-import {imageOptions} from './consts';
-import {useResetState} from './hooks';
+} from '../state/atoms';
+import {imageOptions} from '../utils/consts';
+import {useResetState} from '../hooks/hooks';
 
 export function ExampleImages() {
   const [, setImageSrc] = useAtom(ImageSrcAtom);

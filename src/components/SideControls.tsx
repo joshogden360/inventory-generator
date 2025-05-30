@@ -24,8 +24,8 @@ import {
   ImageSentAtom,
   ImageSrcAtom,
   IsUploadedImageAtom,
-} from './atoms';
-import {useResetState} from './hooks';
+} from '../state/atoms';
+import {useResetState} from '../hooks/hooks';
 import {ScreenshareButton} from './ScreenshareButton';
 
 export function SideControls() {

@@ -18,7 +18,7 @@
 // limitations under the License.
 
 import {useAtom} from 'jotai';
-import {ProcessingStatusAtom, UploadProgressAtom} from './atoms';
+import {ProcessingStatusAtom, UploadProgressAtom} from '../state/atoms';
 
 export function LoadingIndicator() {
   const [processingStatus] = useAtom(ProcessingStatusAtom);

@@ -25,7 +25,7 @@ import {
   BumpSessionAtom,
   ImageSentAtom,
   PointsAtom,
-} from './atoms';
+} from '../state/atoms';
 
 export function useResetState() {
   const [, setImageSent] = useAtom(ImageSentAtom);

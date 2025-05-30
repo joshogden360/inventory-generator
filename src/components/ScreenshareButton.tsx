@@ -18,8 +18,8 @@
 // limitations under the License.
 
 import {useAtom} from 'jotai';
-import {ShareStream} from './atoms';
-import {useResetState} from './hooks';
+import {ShareStream} from '../state/atoms';
+import {useResetState} from '../hooks/hooks';
 
 export function ScreenshareButton() {
   const [, setStream] = useAtom(ShareStream);

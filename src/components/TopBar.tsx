@@ -18,8 +18,8 @@
 // limitations under the License.
 
 import {useAtom} from 'jotai';
-import {DetectTypeAtom, HoverEnteredAtom, RevealOnHoverModeAtom} from './atoms';
-import {useResetState} from './hooks';
+import {DetectTypeAtom, HoverEnteredAtom, RevealOnHoverModeAtom} from '../state/atoms';
+import {useResetState} from '../hooks/hooks';
 
 export function TopBar() {
   const resetState = useResetState();

@@ -18,8 +18,8 @@
 // limitations under the License.
 
 import {useAtom} from 'jotai';
-import {DetectTypeAtom, HoverEnteredAtom} from './atoms';
-import {DetectTypes} from './Types';
+import {DetectTypeAtom, HoverEnteredAtom} from '../state/atoms';
+import {DetectTypes} from '../types/types';
 
 export function DetectTypeSelector() {
   return (

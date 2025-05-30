@@ -18,8 +18,8 @@
 // limitations under the License.
 
 import {useAtom} from 'jotai';
-import {ActiveColorAtom} from './atoms';
-import {colors} from './consts';
+import {ActiveColorAtom} from '../state/atoms';
+import {colors} from '../utils/consts';
 
 export function Palette() {
   const [activeColor, setActiveColor] = useAtom(ActiveColorAtom);

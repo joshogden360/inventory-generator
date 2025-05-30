@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@google/genai": "^0.7.0",
+    "@google/generative-ai": "^0.8.0",
     "@tailwindcss/browser": "^4.0.17",
     "jotai": "^2.10.0",
     "perfect-freehand": "^1.2.2",
@@ -18,7 +18,14 @@
     "react-resize-detector": "^12.0.2"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.8",
     "@types/node": "^22.14.0",
+    "@types/react": "^19.1.5",
+    "@types/react-dom": "^19.1.5",
+    "autoprefixer": "^10.4.21",
+    "daisyui": "^5.0.40",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^4.1.8",
     "typescript": "~5.7.2",
     "vite": "^6.2.0"
   }
