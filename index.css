@@ -5,6 +5,7 @@ body,
 #root {
   height: 100%;
   margin: 0;
+  @apply text-gray-100 bg-gray-950 antialiased;
 }
 
 body {
@@ -19,7 +20,7 @@ input, select {
 
 input[type="text"],
 textarea {
-  color: var(--text-color-primary);
+  /* Removed default color to allow Tailwind classes like text-white to control the text color */
   border: 1px solid var(--border-color);
 }
 
@@ -80,7 +81,7 @@ button, .button {
   font-family: inherit;
   font-size: inherit;
   font-weight: inherit;
-  color: var(--text-color-primary);
+  /* Removed explicit color so Tailwind utility classes (e.g., text-white) can control button text color */
   border: 1px solid var(--border-color);
   padding: 14px 20px;
   border-radius: var(--box-radius);
@@ -113,7 +114,7 @@ input[type="text"] {
   font-family: inherit;
   font-size: inherit;
   font-weight: inherit;
-  color: var(--text-color-primary);
+  /* Removed default color to allow Tailwind classes like text-white to control the text color */
   border: none;
   padding: 14px 18px;
 }
@@ -145,4 +146,24 @@ input[type="range"] {
   border-radius: var(--box-radius);
   padding: 14px 28px;
   max-width: 340px;
+}
+
+/* Global typography and color overrides for better visibility */
+html, body {
+  @apply text-gray-100 bg-gray-950 antialiased;
+}
+
+/* Ensure DaisyUI base-content text is bright enough */
+.text-base-content {
+  @apply text-gray-100 !important;
+}
+
+/* Improve default placeholder visibility */
+::placeholder {
+  @apply text-gray-400 opacity-70;
+}
+
+/* Standardize button font weight for readability */
+.btn {
+  @apply font-semibold;
 }

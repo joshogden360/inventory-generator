@@ -327,12 +327,12 @@ Ensure labels are concise and user-friendly for an inventory system. Return ONLY
       <div
         className={`text-sm transition-all duration-300 flex items-center ${
           processingStatus === 'complete'
-            ? 'text-success font-medium'
+            ? 'text-green-400 font-medium'
             : processingStatus === 'error'
-            ? 'text-error font-medium'
+            ? 'text-red-400 font-medium'
             : processingStatus === 'idle'
-            ? 'text-base-content/70'
-            : 'text-info font-medium'
+            ? 'text-gray-300'
+            : 'text-blue-400 font-medium'
         }`}
       >
         {(processingStatus === 'uploading' || processingStatus === 'processing') && (
@@ -361,7 +361,7 @@ Ensure labels are concise and user-friendly for an inventory system. Return ONLY
       <div className="flex items-start gap-2">
         <input
           type="text"
-          className="input input-bordered input-sm flex-1 focus:input-primary transition-all"
+          className="input input-bordered input-sm flex-1 bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500 focus:bg-gray-600 transition-all"
           placeholder="Describe items (e.g., kitchenware, books)"
           value={targetPrompt}
           onChange={(e: ChangeEvent<HTMLInputElement>) => setTargetPrompt(e.target.value)}
@@ -376,7 +376,7 @@ Ensure labels are concise and user-friendly for an inventory system. Return ONLY
         <div className="flex flex-col items-stretch gap-1">
           <button
             className={`btn btn-sm ${
-              processingStatus === 'complete' ? 'btn-success' : 'btn-primary'
+              processingStatus === 'complete' ? 'bg-green-600 hover:bg-green-700 text-white border-green-600' : 'bg-blue-600 hover:bg-blue-700 text-white border-blue-600'
             } ${isProcessing ? 'loading' : ''} transition-all`}
             onClick={handleSend}
             disabled={!ai || (!imageSrc && !stream) || isProcessing}

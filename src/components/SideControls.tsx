@@ -38,7 +38,7 @@ export function SideControls() {
 
   return (
     <div className="flex flex-col gap-3">
-      <label className="flex items-center button bg-[#3B68FF] px-12 !text-white !border-none">
+      <label className="btn btn-primary gap-2 cursor-pointer">
         <input
           className="hidden"
           type="file"
@@ -62,7 +62,7 @@ export function SideControls() {
       </label>
       <div className="hidden">
         <button
-          className="button flex gap-3 justify-center items-center"
+          className="btn btn-secondary gap-3"
           onClick={() => {
             setDrawMode(!drawMode);
           }}>

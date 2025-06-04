@@ -420,7 +420,7 @@ export function Content() {
                     <div 
                       className={`
                         inline-flex items-center gap-1.5 
-                        bg-gray-900/95 backdrop-blur-sm 
+                        bg-gray-900/90 backdrop-blur-sm 
                         text-white text-xs font-medium
                         px-2 py-1 rounded
                         shadow-lg
@@ -441,7 +441,7 @@ export function Content() {
                         <>
                           <div className="w-px h-3 bg-white/30 mx-0.5"></div>
                           {isSaving ? (
-                            <svg className="w-3.5 h-3.5 animate-spin flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-3.5 h-3.5 animate-spin flex-shrink-0 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                               <path className="opacity-75" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
@@ -449,21 +449,21 @@ export function Content() {
                             <div className="flex items-center gap-1">
                               {/* Quick save button */}
                               <button 
-                                className="p-0.5 hover:bg-white/20 rounded transition-all hover:scale-110"
+                                className="p-1 hover:bg-white/20 rounded transition-all hover:scale-110 min-w-[28px] min-h-[28px] flex items-center justify-center"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleSaveToInventory(box, i);
                                 }}
                                 title="Quick save to inventory"
                               >
-                                <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="w-4 h-4 flex-shrink-0 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V2" />
                                 </svg>
                               </button>
                               
                               {/* Crop and edit button */}
                               <button 
-                                className="p-0.5 hover:bg-white/20 rounded transition-all hover:scale-110"
+                                className="p-1 hover:bg-white/20 rounded transition-all hover:scale-110 min-w-[28px] min-h-[28px] flex items-center justify-center"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   setSelectedBox(box);
@@ -471,7 +471,7 @@ export function Content() {
                                 }}
                                 title="Crop and edit"
                               >
-                                <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="w-4 h-4 flex-shrink-0 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                 </svg>
                               </button>

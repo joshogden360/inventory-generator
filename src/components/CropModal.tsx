@@ -298,70 +298,141 @@ export function CropModal({ isOpen, onClose, box, onSave }: CropModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-base-100 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
-        <div className="p-6 border-b border-base-300">
-          <h2 className="text-2xl font-bold">Crop & Edit Item</h2>
-          <p className="text-sm opacity-70 mt-1">Adjust the crop area and edit item details</p>
+    <div className="modal modal-open bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="modal-box bg-gray-800 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden text-white border border-gray-600">
+        <div className="p-6 border-b border-gray-700">
+          <h2 className="text-2xl font-bold text-white">Crop & Edit Item</h2>
+          <p className="text-sm text-gray-300 mt-1">Adjust the crop area and edit item details</p>
         </div>
         
         <div className="p-6 space-y-6">
           {/* Canvas for cropping */}
           <div 
             ref={containerRef}
-            className="relative bg-base-200 rounded-lg overflow-hidden"
-            style={{ height: '400px' }}
+            className="relative bg-black rounded-lg overflow-hidden border border-gray-600"
+            style={{
+              width: '100%',
+              height: '400px',
+            }}
           >
             <canvas
               ref={canvasRef}
-              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+              className="w-full h-full cursor-crosshair"
               onMouseDown={handleMouseDown}
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}
               onMouseLeave={handleMouseUp}
             />
+            
+            {cropBox && (
+              <div 
+                className="absolute border-2 border-blue-500 bg-blue-500/20"
+                style={{
+                  left: `${cropBox.x}px`,
+                  top: `${cropBox.y}px`,
+                  width: `${cropBox.width}px`,
+                  height: `${cropBox.height}px`,
+                }}
+              >
+                {/* Resize handles */}
+                <div className="absolute -top-1 -left-1 w-2 h-2 bg-blue-500 border border-white cursor-nw-resize"></div>
+                <div className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 border border-white cursor-ne-resize"></div>
+                <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-blue-500 border border-white cursor-sw-resize"></div>
+                <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-blue-500 border border-white cursor-se-resize"></div>
+              </div>
+            )}
           </div>
           
-          {/* Label editing */}
-          <div className="space-y-4">
-            <div>
-              <label className="label">
-                <span className="label-text font-medium">Item Name</span>
-              </label>
-              <div className="flex gap-2">
+          {/* Item Details Form */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <div>
+                <label className="label">
+                  <span className="label-text text-white font-medium">Item Name</span>
+                </label>
                 <input
                   type="text"
                   value={label}
                   onChange={(e) => setLabel(e.target.value)}
-                  className="input input-bordered flex-1"
+                  className="input input-bordered w-full bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500"
                   placeholder="Enter item name..."
                 />
-                <button
-                  onClick={handleRegenerate}
-                  className={`btn btn-secondary ${isGenerating ? 'loading' : ''}`}
-                  disabled={isGenerating}
+              </div>
+              
+              <div>
+                <label className="label">
+                  <span className="label-text text-white font-medium">Category</span>
+                </label>
+                <input
+                  type="text"
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="input input-bordered w-full bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500"
+                  placeholder="e.g., Kitchen, Electronics..."
+                />
+              </div>
+              
+              <div>
+                <label className="label">
+                  <span className="label-text text-white font-medium">Notes</span>
+                </label>
+                <textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  className="textarea textarea-bordered w-full bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500"
+                  rows={3}
+                  placeholder="Additional notes..."
+                />
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="label">
+                  <span className="label-text text-white font-medium">AI Generated Tags</span>
+                </label>
+                <button 
+                  onClick={generateTags}
+                  className={`btn bg-blue-600 hover:bg-blue-700 text-white border-blue-600 ${isGenerating ? 'loading' : ''}`}
+                  disabled={isGenerating || !label}
                 >
-                  {!isGenerating && (
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                  )}
-                  Regenerate
+                  {isGenerating ? 'Generating...' : 'Generate Tags'}
                 </button>
+                {aiTags.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-1">
+                    {aiTags.map((tag, index) => (
+                      <span key={index} className="badge bg-blue-600 text-white border-blue-500">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+              
+              <div>
+                <label className="label">
+                  <span className="label-text text-white font-medium">Preview</span>
+                </label>
+                <div className="aspect-square bg-black rounded-lg border border-gray-600 overflow-hidden">
+                  {croppedImageUrl ? (
+                    <img src={croppedImageUrl} alt="Cropped preview" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-400">
+                      <span>Preview will appear here</span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
         </div>
         
-        <div className="p-6 border-t border-base-300 flex justify-end gap-3">
-          <button onClick={onClose} className="btn btn-ghost">
+        <div className="p-6 border-t border-gray-700 flex justify-end gap-3">
+          <button onClick={onClose} className="btn btn-ghost text-gray-300 hover:text-white hover:bg-gray-700">
             Cancel
           </button>
-          <button onClick={handleSave} className="btn btn-primary">
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V2" />
-            </svg>
-            Save to Inventory
+          <button onClick={handleSave} className="btn bg-blue-600 hover:bg-blue-700 text-white border-blue-600">
+            Save Item
           </button>
         </div>
       </div>
