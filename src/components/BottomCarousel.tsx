@@ -8,9 +8,8 @@ import {
   UploadedImagesAtom,
   CurrentImageIndexAtom,
   ImageSrcAtom,
-  ShowBottomCarouselAtom,
   IsUploadedImageAtom,
-  BumpSessionAtom,
+  ShareStream,
 } from '../state/atoms';
 import {useResetState} from '../hooks/hooks';
 
@@ -18,21 +17,21 @@ export function BottomCarousel() {
   const [uploadedImages, setUploadedImages] = useAtom(UploadedImagesAtom);
   const [currentIndex, setCurrentIndex] = useAtom(CurrentImageIndexAtom);
   const [, setImageSrc] = useAtom(ImageSrcAtom);
-  const [showBottomCarousel] = useAtom(ShowBottomCarouselAtom);
   const [, setIsUploadedImage] = useAtom(IsUploadedImageAtom);
-  const [, setBumpSession] = useAtom(BumpSessionAtom);
+  const [, setShareStream] = useAtom(ShareStream);
+
   const resetState = useResetState();
 
   const handleSelectImage = (index: number) => {
     if (index >= 0 && index < uploadedImages.length) {
       setCurrentIndex(index);
       setImageSrc(uploadedImages[index].src);
+      setShareStream(null);
     }
   };
 
   const handleDeleteImage = (index: number, event: React.MouseEvent) => {
     event.stopPropagation();
-    const imageToDeleteId = uploadedImages[index]?.id;
     const newImages = uploadedImages.filter((_, i) => i !== index);
     setUploadedImages(newImages);
     
@@ -52,10 +51,11 @@ export function BottomCarousel() {
       
       setCurrentIndex(newIndex);
       setImageSrc(newImages[newIndex].src);
+      setShareStream(null);
     }
   };
 
-  if (!showBottomCarousel || uploadedImages.length === 0) {
+  if (uploadedImages.length === 0) {
     return null;
   }
 

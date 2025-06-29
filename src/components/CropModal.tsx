@@ -12,6 +12,10 @@ interface CropModalProps {
 export function CropModal({ isOpen, onClose, box, onSave }: CropModalProps) {
   const [imageSrc] = useAtom(ImageSrcAtom);
   const [label, setLabel] = useState(box?.label || '');
+  const [category, setCategory] = useState('');
+  const [notes, setNotes] = useState('');
+  const [aiTags, setAiTags] = useState<string[]>([]);
+  const [croppedImageUrl] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [cropBox, setCropBox] = useState({
     x: 0,
@@ -286,11 +290,13 @@ export function CropModal({ isOpen, onClose, box, onSave }: CropModalProps) {
     onClose();
   };
 
-  const handleRegenerate = async () => {
+
+
+  const generateTags = async () => {
     setIsGenerating(true);
-    // TODO: Call AI to regenerate label
+    // TODO: Call AI to generate tags
     setTimeout(() => {
-      setLabel(`${label} (regenerated)`);
+      setAiTags([label.toLowerCase(), 'item', 'detected']);
       setIsGenerating(false);
     }, 1000);
   };

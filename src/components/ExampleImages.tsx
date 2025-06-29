@@ -23,7 +23,8 @@ import {
   ImageSrcAtom,
   IsUploadedImageAtom,
   ProcessingStatusAtom,
-  UploadProgressAtom
+  UploadProgressAtom,
+  ShareStream
 } from '../state/atoms';
 import {imageOptions} from '../utils/consts';
 import {useResetState} from '../hooks/hooks';
@@ -33,6 +34,7 @@ export function ExampleImages() {
   const [, setIsUploadedImage] = useAtom(IsUploadedImageAtom);
   const [, setProcessingStatus] = useAtom(ProcessingStatusAtom);
   const [, setUploadProgress] = useAtom(UploadProgressAtom);
+  const [, setShareStream] = useAtom(ShareStream);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const resetState = useResetState();
   
@@ -61,6 +63,7 @@ export function ExampleImages() {
       setUploadProgress(100);
       setImageSrc(reader.result as string);
       setIsUploadedImage(true);
+      setShareStream(null);
       resetState();
       
       // Show complete status for 1 second before setting to idle
@@ -90,6 +93,7 @@ export function ExampleImages() {
             onClick={() => {
               setIsUploadedImage(false);
               setImageSrc(image);
+              setShareStream(null);
               resetState();
             }}>
             <img

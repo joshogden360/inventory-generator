@@ -17,52 +17,65 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import React, {useEffect, useState} from 'react';
 import {useAtom} from 'jotai';
-import {useEffect} from 'react';
 import {Content} from './Content';
-import {Inventory} from './Inventory';
 import {LoadingIndicator} from './LoadingIndicator';
-import {Prompt} from './Prompt';
-import {FileCarousel} from './FileCarousel';
+import {MainToolbar} from './MainToolbar';
 import {BottomCarousel} from './BottomCarousel';
-import {LeftPanelInventory} from './LeftPanelInventory';
+import {RightPanelInventory} from './RightPanelInventory';
 import {SideNavbar} from './SideNavbar';
 import {
   BumpSessionAtom,
   ImageSrcAtom,
   InitFinishedAtom,
-  InventoryItemsAtom,
   IsUploadedImageAtom,
   ShowInventoryAtom,
   DetectTypeAtom,
   UploadedImagesAtom,
-  ShowFileCarouselAtom,
-  CurrentImageIndexAtom,
-  InventorySidePanelModeAtom,
-  LightroomLayoutModeAtom,
-  LeftPanelExpandedAtom,
   ShareStream,
+  InventoryItemsAtom,
+  LeftPanelExpandedAtom,
+  RightPanelExpandedAtom,
 } from '../state/atoms';
-import {useResetState} from '../hooks/hooks';
 
 function App() {
   const [imageSrc, setImageSrc] = useAtom(ImageSrcAtom);
-  const resetState = useResetState();
-  const [initFinished] = useAtom(InitFinishedAtom);
+  const [initFinished, setInitFinished] = useState(false);
   const [, setBumpSession] = useAtom(BumpSessionAtom);
   const [, setIsUploadedImage] = useAtom(IsUploadedImageAtom);
   const [showInventory] = useAtom(ShowInventoryAtom);
   const [stream] = useAtom(ShareStream);
+  const [, setShareStream] = useAtom(ShareStream);
   const [, setDetectType] = useAtom(DetectTypeAtom);
-  const [uploadedImages, setUploadedImages] = useAtom(UploadedImagesAtom);
-  const [lightroomLayoutMode] = useAtom(LightroomLayoutModeAtom);
-  const [inventorySidePanelMode] = useAtom(InventorySidePanelModeAtom);
+  const [, setUploadedImages] = useAtom(UploadedImagesAtom);
+  const [inventoryItems] = useAtom(InventoryItemsAtom);
   const [leftPanelExpanded] = useAtom(LeftPanelExpandedAtom);
+  const [rightPanelExpanded] = useAtom(RightPanelExpandedAtom);
+
+  // Simple static title component
+  const StaticTitle = () => (
+    <div className="text-center">
+      <h1 className="text-4xl font-bold text-white font-ui mb-4">The Itemizer</h1>
+      <p className="text-base font-medium text-slate-300 font-ui">
+        Itemize and organize with ease.
+      </p>
+    </div>
+  );
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', 'dark');
     setDetectType('2D bounding boxes');
   }, [setDetectType]);
+
+  // Initialize the app
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setInitFinished(true);
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const generateImageId = () => {
     return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
@@ -73,39 +86,43 @@ function App() {
     input.type = 'file';
     input.accept = 'image/*';
     input.multiple = true;
-    input.onchange = (event) => {
-      const files = Array.from((event.target as HTMLInputElement).files || []);
-      if (files.length > 0) {
-        const newImagesData: { id: string; src: string; name: string; uploadDate: string }[] = [];
-        let firstNewImageSrc: string | null = null;
-
-        files.forEach((file, index) => {
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            const imageSrcResult = e.target?.result as string;
-            const imageData = {
-              id: generateImageId(),
-              src: imageSrcResult,
-              name: file.name,
-              uploadDate: new Date().toISOString(),
+    input.onchange = (e) => {
+      const files = (e.target as HTMLInputElement).files;
+      if (files && files.length > 0) {
+        const imagePromises = Array.from(files).map((file, index) => {
+          return new Promise<{id: string, src: string, name: string}>((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+              resolve({
+                id: `${Date.now()}-${index}`,
+                src: event.target?.result as string,
+                name: file.name
+              });
             };
-            newImagesData.push(imageData);
+            reader.readAsDataURL(file);
+          });
+        });
 
-            if (index === 0 && !firstNewImageSrc) {
-              firstNewImageSrc = imageSrcResult;
-            }
-
-            if (newImagesData.length === files.length) {
-              const currentUploadedCount = uploadedImages.length;
-              setUploadedImages(prev => [...prev, ...newImagesData]);
-              if (firstNewImageSrc) {
-                setImageSrc(firstNewImageSrc);
-                setIsUploadedImage(true);
-                setBumpSession((prev) => prev + 1);
+        Promise.all(imagePromises).then((images) => {
+          const imagesWithDates = images.map(img => ({
+            ...img,
+            uploadDate: new Date().toISOString()
+          }));
+          setUploadedImages(imagesWithDates);
+          if (images.length > 0) {
+            setImageSrc(images[0].src);
+            setIsUploadedImage(true);
+            setShareStream(null);
+            setBumpSession((prev) => prev + 1);
+            
+            // Auto-trigger object detection after a short delay
+            setTimeout(() => {
+              const findItemsButton = document.querySelector('button[title="Detect Items in Image"]') as HTMLButtonElement;
+              if (findItemsButton && !findItemsButton.disabled) {
+                findItemsButton.click();
               }
-            }
-          };
-          reader.readAsDataURL(file);
+            }, 500);
+          }
         });
       }
     };
@@ -133,7 +150,16 @@ function App() {
           setUploadedImages(prev => [...prev, imageData]);
           setImageSrc(imageSrcResult);
           setIsUploadedImage(true);
+          setShareStream(null);
           setBumpSession((prev) => prev + 1);
+          
+          // Auto-trigger object detection after a short delay
+          setTimeout(() => {
+            const findItemsButton = document.querySelector('button[title="Detect Items in Image"]') as HTMLButtonElement;
+            if (findItemsButton && !findItemsButton.disabled) {
+              findItemsButton.click();
+            }
+          }, 500);
         };
         reader.readAsDataURL(file);
       }
@@ -141,117 +167,100 @@ function App() {
     input.click();
   };
 
-  const CameraIconSvg = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+  const TakePhotoIconSvg = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
       <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
     </svg>
   );
-  const UploadIconSvg = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-    </svg>
-  );
-   const TakePhotoIconSvg = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+
+  const UploadPhotosIconSvg = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
     </svg>
   );
 
   return (
-    <div className="flex flex-row h-screen bg-gray-950 text-gray-100 antialiased" data-theme="dark">
-      <SideNavbar />
-      
-      <main className="flex-1 flex flex-col overflow-hidden">
-        {lightroomLayoutMode ? (
-          <div className="flex-1 flex h-full bg-gray-900">
-            <LeftPanelInventory /> 
-            <div className="flex-1 flex flex-col bg-gray-850">
-              <div className="bg-gray-900 border-b border-gray-700 px-4 py-2 shadow-sm">
-                <Prompt />
+    <div className="w-full h-screen bg-black text-white overflow-hidden flex flex-col">
+      {/* Check if we have uploaded images */}
+      {!imageSrc ? (
+        /* Landing Page */
+        <div className="h-full flex items-center justify-center relative">
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-gray-900 to-blue-900 opacity-90"></div>
+          <div className="relative max-w-3xl mx-auto px-8 text-center">
+            <div className="mb-16">
+              <StaticTitle />
+              <div className="w-20 h-0.5 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full mx-auto mb-4"></div>
+            </div>
+
+            <div className="flex gap-4 justify-center max-w-sm mx-auto">
+              {/* Take Photo Button */}
+              <div
+                onClick={handleCameraCapture}
+                className="group cursor-pointer bg-gradient-to-br from-emerald-500/10 to-emerald-600/10 border border-emerald-500/30 rounded-2xl p-5 hover:from-emerald-500/20 hover:to-emerald-600/20 hover:border-emerald-400/50 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-emerald-500/20 aspect-square w-36 flex flex-col items-center justify-center"
+              >
+                <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                  <TakePhotoIconSvg />
+                </div>
+                <h3 className="text-sm font-semibold text-white font-ui">Take Photo</h3>
               </div>
-              <div className="flex-1 relative overflow-y-auto p-4 bg-black">
-                {imageSrc || stream ? (
-                  <div className="relative h-full w-full max-w-full max-h-full mx-auto my-auto flex items-center justify-center">
-                     <Content />
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-center h-full">
-                    <div className="text-center p-8 bg-gray-800 rounded-lg shadow-xl max-w-md mx-auto">
-                      <div className="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-5">
-                        <CameraIconSvg />
-                      </div>
-                      <h3 className="text-xl font-semibold text-white mb-2">Studio Mode</h3>
-                      <p className="text-gray-400 mb-6 text-sm">Upload an image or use the camera to begin.</p>
-                      <div className="space-y-3">
-                        <button
-                          onClick={handleCameraCapture}
-                          className="btn btn-success btn-block gap-2 bg-green-600 hover:bg-green-700 text-white border-none"
-                        >
-                          <TakePhotoIconSvg />
-                          Take Photo
-                        </button>
-                        <button
-                          onClick={handleImageUpload}
-                          className="btn btn-primary btn-block gap-2 bg-blue-600 hover:bg-blue-700 text-white border-none"
-                        >
-                          <UploadIconSvg />
-                          Upload Photos
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
+
+              {/* Upload Button */}
+              <div
+                onClick={handleImageUpload}
+                className="group cursor-pointer bg-gradient-to-br from-blue-500/10 to-blue-600/10 border border-blue-500/30 rounded-2xl p-5 hover:from-blue-500/20 hover:to-blue-600/20 hover:border-blue-400/50 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/20 aspect-square w-36 flex flex-col items-center justify-center"
+              >
+                <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                  <UploadPhotosIconSvg />
+                </div>
+                <h3 className="text-sm font-semibold text-white font-ui">Upload</h3>
               </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        /* Enhanced Trifold Layout */
+        <div className="flex h-full w-full">
+          {/* Left Panel - Navigation */}
+          <div
+            className={`transition-all duration-300 ${
+              leftPanelExpanded ? 'w-80' : 'w-16'
+            } border-r border-slate-700 flex-shrink-0`}
+          >
+            <SideNavbar />
+          </div>
+
+          {/* Main Area */}
+          <div className="flex flex-col flex-grow">
+            {/* Top Bar */}
+            <div className="bg-slate-800 border-b border-slate-700 px-6 py-4 shadow-sm flex-shrink-0 z-10">
+              <MainToolbar />
+            </div>
+
+            {/* Main Content Area */}
+            <div className="relative overflow-hidden bg-black flex-grow">
+              <div className="h-full w-full flex items-center justify-center p-6">
+                {initFinished ? <Content /> : null}
+                <LoadingIndicator />
+              </div>
+            </div>
+
+            {/* Bottom Carousel */}
+            <div className="border-t border-gray-700">
               <BottomCarousel />
             </div>
           </div>
-        ) : (
-          <div className={`flex-1 flex flex-col overflow-hidden transition-margin duration-300 ease-in-out ${inventorySidePanelMode && showInventory && !leftPanelExpanded ? 'lg:mr-96' : ''} ${inventorySidePanelMode && showInventory && leftPanelExpanded ? 'lg:mr-[calc(24rem+16rem)]' : ''}`}>
-            {!imageSrc && !stream ? (
-              <div className="flex-1 flex items-center justify-center p-6 bg-gray-900">
-                <div className="w-full max-w-md text-center">
-                  <div className="w-20 h-20 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-6 border-2 border-blue-400/50 shadow-lg">
-                    <CameraIconSvg />
-                  </div>
-                  <h2 className="text-3xl font-bold text-white mb-3">The Itemizer</h2>
-                  <p className="text-gray-400 mb-8 text-lg">Itemize and organize with ease.</p>
-                  <div className="space-y-4">
-                    <button
-                      onClick={handleCameraCapture}
-                      className="btn btn-lg bg-green-600 hover:bg-green-700 text-white border-none w-full justify-center gap-2 shadow-md hover:shadow-lg transition-all duration-200"
-                    >
-                      <TakePhotoIconSvg />
-                      Take Photo
-                    </button>
-                    <button
-                      onClick={handleImageUpload}
-                      className="btn btn-lg bg-blue-600 hover:bg-blue-700 text-white border-none w-full justify-center gap-2 shadow-md hover:shadow-lg transition-all duration-200"
-                    >
-                      <UploadIconSvg />
-                      Upload Photos
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="flex-1 flex flex-col h-full bg-black">
-                <div className="flex-1 relative min-h-0 overflow-y-auto">
-                  {initFinished ? <Content /> : null}
-                  <LoadingIndicator />
-                </div>
-                <div className="bg-gray-850 border-t border-gray-700 p-3 shadow-md">
-                  <Prompt />
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-      </main>
 
-      {!lightroomLayoutMode && showInventory && <Inventory />} 
-      <FileCarousel />
+          {/* Right Panel - Inventory */}
+          <div
+            className={`transition-all duration-300 ${
+              showInventory ? (rightPanelExpanded ? 'w-96' : 'w-16') : 'w-0'
+            } border-l border-gray-700 flex-shrink-0 overflow-hidden`}
+          >
+            <RightPanelInventory />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

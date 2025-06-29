@@ -24,6 +24,7 @@ import {
   ImageSentAtom,
   ImageSrcAtom,
   IsUploadedImageAtom,
+  ShareStream,
 } from '../state/atoms';
 import {useResetState} from '../hooks/hooks';
 import {ScreenshareButton} from './ScreenshareButton';
@@ -32,6 +33,7 @@ export function SideControls() {
   const [, setImageSrc] = useAtom(ImageSrcAtom);
   const [drawMode, setDrawMode] = useAtom(DrawModeAtom);
   const [, setIsUploadedImage] = useAtom(IsUploadedImageAtom);
+  const [, setShareStream] = useAtom(ShareStream);
   const [, setBumpSession] = useAtom(BumpSessionAtom);
   const [, setImageSent] = useAtom(ImageSentAtom);
   const resetState = useResetState();
@@ -53,6 +55,7 @@ export function SideControls() {
                 setIsUploadedImage(true);
                 setImageSent(false);
                 setBumpSession((prev) => prev + 1);
+                setShareStream(null);
               };
               reader.readAsDataURL(file);
             }

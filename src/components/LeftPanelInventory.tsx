@@ -9,7 +9,6 @@ import {
   InventoryItemsAtom,
   LeftPanelExpandedAtom,
   ShowInventoryAtom,
-  InventorySidePanelModeAtom,
 } from '../state/atoms';
 import {InventoryItemType} from '../types/types';
 
@@ -17,7 +16,6 @@ export function LeftPanelInventory() {
   const [inventoryItems, setInventoryItems] = useAtom(InventoryItemsAtom);
   const [leftPanelExpanded, setLeftPanelExpanded] = useAtom(LeftPanelExpandedAtom);
   const [, setShowInventory] = useAtom(ShowInventoryAtom);
-  const [, setInventorySidePanelMode] = useAtom(InventorySidePanelModeAtom);
   const [filterCategory, setFilterCategory] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -36,7 +34,6 @@ export function LeftPanelInventory() {
   };
 
   const handleExpandToFullInventoryModal = () => {
-    setInventorySidePanelMode(false);
     setShowInventory(true);
   };
 

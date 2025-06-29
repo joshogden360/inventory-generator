@@ -22,7 +22,7 @@
 import {GoogleGenerativeAI, GenerationConfig, Part} from '@google/generative-ai';
 import {useAtom} from 'jotai';
 import getStroke from 'perfect-freehand';
-import {useState, ChangeEvent, KeyboardEvent, useEffect} from 'react';
+import {useState, ChangeEvent, KeyboardEvent} from 'react';
 import {
   BoundingBoxes2DAtom,
   HoverEnteredAtom,

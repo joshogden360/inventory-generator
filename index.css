@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
 html,
 body,
@@ -9,9 +10,10 @@ body,
 }
 
 body {
-  font-size: 13px;
+  font-size: 14px;
   background-color: var(--bg-color);
   color: var(--text-color-primary);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 input, select {
@@ -40,7 +42,10 @@ textarea:focus {
 
 :root {
   --bg-color: #F3F3F6;
-  --accent-color: #2872E3;
+  --accent-color: #3B82F6;
+  --accent-color-hover: #2563EB;
+  --success-color: #10B981;
+  --success-color-hover: #059669;
   --border-color: #C6C6C9;
   --box-color: #141619;
   --text-color-primary: #1E1E1E;
@@ -48,9 +53,10 @@ textarea:focus {
   --text-size-large: 18px;
   --text-size-medium: 14px;
   --text-size-small: 11px;
-  --box-radius: 8px;
+  --box-radius: 12px;
+  --button-radius: 10px;
   --input-color: #F9F9FC;
-  font-family: "Space Mono", monospace;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-weight: 400;
   font-size: 14px;
   color: var(--text-color-primary);
@@ -58,13 +64,16 @@ textarea:focus {
 }
 
 .dark {
-  --bg-color: #1C1F21;
-  --accent-color: #7FBBFF;
-  --border-color: #37393c;
-  --box-color: #141619;
-  --text-color-primary: #fff;
-  --text-color-secondary: #8c8d8e;
-  --input-color: #404547;
+  --bg-color: #0F172A;
+  --accent-color: #3B82F6;
+  --accent-color-hover: #2563EB;
+  --success-color: #10B981;
+  --success-color-hover: #059669;
+  --border-color: #334155;
+  --box-color: #1E293B;
+  --text-color-primary: #F8FAFC;
+  --text-color-secondary: #94A3B8;
+  --input-color: #334155;
   color: var(--text-color-primary);
   background-color: var(--bg-color);
   color-scheme: dark;
@@ -78,25 +87,37 @@ main {
 button, .button {
   appearance: none;
   cursor: pointer;
-  font-family: inherit;
-  font-size: inherit;
-  font-weight: inherit;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
   /* Removed explicit color so Tailwind utility classes (e.g., text-white) can control button text color */
   border: 1px solid var(--border-color);
-  padding: 14px 20px;
-  border-radius: var(--box-radius);
-  min-height: 56px;
+  padding: 12px 24px;
+  border-radius: var(--button-radius);
+  min-height: 44px;
+  transition: all 0.2s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 button.secondary {
-  padding: 0px 16px;
-  min-height: 32px;
-  display: flex;
+  padding: 8px 16px;
+  min-height: 36px;
+  font-size: 13px;
+  display: inline-flex;
   align-items: center;
 }
 
 button:hover, .button:hover {
   border-color: var(--accent-color);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+button:active, .button:active {
+  transform: translateY(0);
 }
 
 a {
@@ -111,12 +132,13 @@ a:hover {
 
 input[type="text"] {
   appearance: none;
-  font-family: inherit;
-  font-size: inherit;
-  font-weight: inherit;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 14px;
+  font-weight: 400;
   /* Removed default color to allow Tailwind classes like text-white to control the text color */
   border: none;
-  padding: 14px 18px;
+  padding: 12px 16px;
+  border-radius: var(--button-radius);
 }
 
 input[type="text"]::placeholder {
@@ -131,26 +153,34 @@ input[type="range"] {
   accent-color: var(--accent-color);
 }
 
-
 .box {
   border-radius: var(--box-radius);
   background: var(--box-color);
-  padding: 28px 42px;
+  padding: 24px 32px;
   font-size: var(--text-size-large);
-  margin: 30px 0;
+  margin: 24px 0;
 }
 
 .box-caption {
   color: var(--bg-color);
   background: var(--accent-color);
   border-radius: var(--box-radius);
-  padding: 14px 28px;
+  padding: 12px 24px;
   max-width: 340px;
 }
 
 /* Global typography and color overrides for better visibility */
 html, body {
-  @apply text-gray-100 bg-gray-950 antialiased;
+  @apply text-gray-100 bg-slate-900 antialiased;
+}
+
+/* Font family utilities */
+.font-mono {
+  font-family: "Space Mono", "Consolas", "Monaco", monospace !important;
+}
+
+.font-ui {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
 }
 
 /* Ensure DaisyUI base-content text is bright enough */
@@ -163,7 +193,206 @@ html, body {
   @apply text-gray-400 opacity-70;
 }
 
-/* Standardize button font weight for readability */
+/* Enhanced button styles */
 .btn {
-  @apply font-semibold;
+  @apply font-medium transition-all duration-200 ease-in-out;
+  border-radius: var(--button-radius);
+  min-height: 44px;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn-lg {
+  min-height: 52px;
+  padding: 14px 28px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* Primary button improvements */
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-color-hover) 100%);
+  border-color: var(--accent-color);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, var(--accent-color-hover) 0%, #1D4ED8 100%);
+  border-color: var(--accent-color-hover);
+}
+
+/* Success button improvements */
+.btn-success {
+  background: linear-gradient(135deg, var(--success-color) 0%, var(--success-color-hover) 100%);
+  border-color: var(--success-color);
+}
+
+.btn-success:hover {
+  background: linear-gradient(135deg, var(--success-color-hover) 0%, #047857 100%);
+  border-color: var(--success-color-hover);
+}
+
+/* Navigation improvements */
+.nav-button {
+  @apply transition-all duration-200 ease-in-out rounded-xl;
+  padding: 12px 16px;
+}
+
+.nav-button:hover {
+  @apply bg-slate-700/70;
+  transform: translateX(4px);
+}
+
+.nav-button:active {
+  transform: translateX(2px);
+}
+
+@keyframes fade-in-down {
+  from {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes draw-line {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes jitter {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate(-2px, -1px) rotate(-1deg);
+  }
+  50% {
+    transform: translate(1px, -2px) rotate(1deg);
+  }
+  75% {
+    transform: translate(-1px, 1px) rotate(-0.5deg);
+  }
+}
+
+@keyframes pulse-once {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes subtle-float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes particle {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 1;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(calc(-50% + var(--particle-x)), calc(-50% + var(--particle-y))) scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes particle-subtle {
+  0% {
+    transform: translate(0, 0) scale(0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(var(--particle-x), var(--particle-y)) scale(1);
+    opacity: 0;
+  }
+}
+
+.animate-fade-in-down {
+  animation: fade-in-down 0.7s ease-out forwards;
+  opacity: 0;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out forwards;
+  opacity: 0;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.7s ease-out forwards;
+  opacity: 0;
+}
+
+.animate-draw-line {
+  animation: draw-line 0.6s 0.4s ease-out forwards;
+  transform: scaleX(0);
+}
+
+.animate-jitter {
+  animation: jitter 0.3s ease-in-out infinite;
+}
+
+.animate-pulse-once {
+  animation: pulse-once 0.6s ease-in-out;
+}
+
+.animate-subtle-float {
+  animation: subtle-float 0.6s ease-in-out infinite;
+}
+
+.animate-particle {
+  animation: particle 1.5s ease-out forwards;
+}
+
+.animation-delay-200 { animation-delay: 0.2s; }
+.animation-delay-400 { animation-delay: 0.4s; }
+.animation-delay-600 { animation-delay: 0.6s; }
+.animation-delay-800 { animation-delay: 0.8s; }
+.animation-delay-1000 { animation-delay: 1s; }

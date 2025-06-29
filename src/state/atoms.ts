@@ -22,7 +22,6 @@ import {
   colors,
   defaultPromptParts,
   defaultPrompts,
-  imageOptions,
 } from '../utils/consts';
 import {
   BoundingBox2DType,
@@ -93,20 +92,23 @@ export const BumpSessionAtom = atom(0);
 
 export const IsUploadedImageAtom = atom(false);
 
+export const SelectionModeAtom = atom<'single' | 'multi' | 'crop'>('single');
+
+export const ZoomAtom = atom(1);
+export const PanAtom = atom({ x: 0, y: 0 });
+export const ViewResetAtom = atom(0);
+
 // New atoms for loading and inventory features
 export const IsLoadingAtom = atom(false);
 export const UploadProgressAtom = atom(0);
 export const ProcessingStatusAtom = atom<'idle' | 'uploading' | 'processing' | 'complete' | 'error'>('idle');
 export const InventoryItemsAtom = atom<InventoryItemType[]>([]);
 export const ShowInventoryAtom = atom(false);
-export const InventorySidePanelModeAtom = atom(false);
 
 // File carousel atoms
 export const UploadedImagesAtom = atom<{id: string, src: string, name: string, uploadDate: string}[]>([]);
 export const CurrentImageIndexAtom = atom(0);
-export const ShowFileCarouselAtom = atom(false);
 
-// Layout control atoms
-export const LightroomLayoutModeAtom = atom(false);
-export const LeftPanelExpandedAtom = atom(false);
-export const ShowBottomCarouselAtom = atom(true);
+// Simplified layout control atoms - IDE-like trifold layout
+export const LeftPanelExpandedAtom = atom(true);   // Navigation sidebar (expanded by default)
+export const RightPanelExpandedAtom = atom(true);  // Inventory panel (expanded by default)
